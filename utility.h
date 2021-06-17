@@ -20,6 +20,12 @@ namespace mdr
 	for (size_t i = 0; i < size; i++)
 	    copy(from[i], to[i]);
     }
+
+    template<typename T>
+    T&& move(T& t)
+    {
+	return static_cast<T&&>(t);
+    }
 }
 
 #endif

@@ -6,9 +6,9 @@
 namespace mdr
 {
     template<typename container_type, typename value_type>
-    class iterator
+    class basic_iterator
     {
-	using it = iterator<container_type, value_type>;
+	using it = basic_iterator<container_type, value_type>;
 	
     public:
 	friend container_type;
@@ -62,7 +62,7 @@ namespace mdr
 	}
 	
     private:
-	constexpr iterator(container_type& container, size_t index)
+	constexpr basic_iterator(container_type& container, size_t index)
 	    : m_index(index)
 	    , m_container(container)
 

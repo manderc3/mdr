@@ -1,8 +1,6 @@
 #ifndef _MDR_VECTOR_H_
 #define _MDR_VECTOR_H_
 
-#include <iostream>
-
 #include "assert.h"
 #include "types.h"
 #include "utility.h"
@@ -14,8 +12,8 @@ namespace mdr
     class vector
     {
     public:
-	using iterator = mdr::iterator<vector, T>;
-	using const_iterator = mdr::iterator<const vector, const T>;
+	using iterator = basic_iterator<vector, T>;
+	using const_iterator = basic_iterator<const vector, const T>;
 	
 	vector()
 	    : m_buffer(internal_alloc(m_capacity))
@@ -32,7 +30,7 @@ namespace mdr
 
 	vector(vector<T>&& rhs)
 	{
-	    internal_move(rhs);
+	    internal_move(move(rhs));
 	}
 	
 	~vector()
@@ -53,7 +51,7 @@ namespace mdr
 
 	vector& operator=(vector<T>&& rhs)
 	{
-	    internal_move(rhs);
+	    internal_move(move(rhs));
 	}
 
 	T& operator[](size_t index) const
@@ -74,22 +72,22 @@ namespace mdr
 
 	iterator begin()
 	{
-	    return iterator(*this, 0);
+	    return { *this, 0 };
 	}
 
 	iterator end()
 	{
-	    return iterator(*this, m_size);
+	    return { *this, m_size };
 	}
 
 	const_iterator cbegin() const
 	{
-	    return const_iterator(*this, 0);
+	    return { *this, 0 };
 	}
 
 	const_iterator cend() const
 	{
-	    return const_iterator(*this, m_size);
+	    return { *this, m_size };
 	}
 
 	const size_t size() const

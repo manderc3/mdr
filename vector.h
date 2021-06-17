@@ -1,8 +1,11 @@
 #ifndef _MDR_VECTOR_H_
 #define _MDR_VECTOR_H_
 
+#include <iostream>
+
 #include "assert.h"
 #include "types.h"
+#include "utility.h"
 #include "iterator.h"
 
 namespace mdr
@@ -12,7 +15,7 @@ namespace mdr
     {
     public:
 	using iterator = mdr::iterator<vector, T>;
-	using const_iterator = mdr::iterator<vector const, T const>;
+	using const_iterator = mdr::iterator<const vector, const T>;
 	
 	vector()
 	    : m_buffer(internal_alloc(m_capacity))
@@ -24,7 +27,12 @@ namespace mdr
 	    , m_size(rhs.m_size)
 	    , m_buffer(internal_alloc(rhs.m_capacity))
 	{
-	    copy_elements(rhs.m_buffer, m_buffer);
+	    copy_elements(rhs.m_buffer, m_buffer, m_size);
+	}
+
+	vector(vector<T>&& rhs)
+	{
+	    internal_move(rhs);
 	}
 	
 	~vector()
@@ -38,12 +46,19 @@ namespace mdr
 	    m_size = rhs.m_size;
 	    m_buffer = internal_alloc(rhs.m_capacity);
 
-	    copy_elements(rhs.m_buffer, m_buffer);
-	}	      
+	    copy_elements(rhs.m_buffer, m_buffer, m_size);
+
+	    return *this;
+	}
+
+	vector& operator=(vector<T>&& rhs)
+	{
+	    internal_move(rhs);
+	}
 
 	T& operator[](size_t index) const
 	{
-	    assert(index > 0 && index < m_size);
+	    assert(index >= 0 && index < m_size);
 	    return m_buffer[index];
 	}
 
@@ -118,7 +133,7 @@ namespace mdr
 	    auto new_capacity { m_capacity * 2 };
 	    auto* new_buffer = internal_alloc(new_capacity);
 	    
-	    copy_elements(m_buffer, new_buffer);
+	    copy_elements(m_buffer, new_buffer, m_size);
 	    internal_dealloc(m_buffer, m_size);
 
 	    m_buffer = new_buffer;
@@ -138,10 +153,18 @@ namespace mdr
 	    ::operator delete(buffer);
 	}
 
-	void copy_elements(T* from, T* to)
+	void internal_move(vector<T>&& rhs)
 	{
-	    for (size_t i = 0; i < m_size; i++)	    
-		to[i] = from[i];
+	    if (m_buffer != nullptr)
+		internal_dealloc(m_buffer, m_size);
+
+	    m_capacity = rhs.m_capacity;
+	    m_size = rhs.m_size;
+	    m_buffer = rhs.m_buffer;
+
+	    rhs.m_capacity = 0;
+	    rhs.m_size = 0;
+	    rhs.m_buffer = nullptr;
 	}
 
 	size_t m_capacity { 10 };

@@ -15,12 +15,12 @@ namespace mdr
 
 	constexpr it operator+(const it& rhs) const
 	{
-	    return it(m_container, m_index + rhs.m_index);
+	    return { m_container, m_index + rhs.m_index };
 	}
 	
 	constexpr it operator-(const it& rhs) const
 	{
-	    return it(m_container, m_index - rhs.m_index);
+	    return { m_container, m_index - rhs.m_index };
 	}
 
 	constexpr it operator++()

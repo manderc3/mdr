@@ -49,12 +49,12 @@ namespace mdr
 
 	const_iterator cbegin() const
 	{
-	    return iterator(*this, 0);
+	    return const_iterator(*this, 0);
 	}
 
 	const_iterator cend() const
 	{
-	    return iterator(*this, m_size - 1);
+	    return const_iterator(*this, m_size - 1);
 	}
 
 	const size_t size() const

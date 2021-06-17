@@ -7,16 +7,14 @@
 namespace mdr
 {
     template<typename T>
-    void copy(const T& from, T& to)
+    constexpr void copy(const T& from, T& to)
     {
 	to = from;
     }
 
     template<typename T>
-    void copy_elements(T* from, T* to, size_t size)
+    constexpr void copy_elements(const T* from, T* to, size_t size)
     {
-	assert(from != nullptr && to != nullptr);
-	
 	for (size_t i = 0; i < size; i++)
 	    copy(from[i], to[i]);
     }

@@ -18,7 +18,7 @@ namespace mdr
 	vector()
 	    : m_buffer(internal_alloc(m_capacity))
 	{
-	}
+	}	
 
 	vector(const vector<T>& rhs)
 	    : m_capacity(rhs.m_capacity)
@@ -45,13 +45,13 @@ namespace mdr
 	    m_buffer = internal_alloc(rhs.m_capacity);
 
 	    copy_elements(rhs.m_buffer, m_buffer, m_size);
-
 	    return *this;
 	}
 
 	vector& operator=(vector<T>&& rhs)
 	{
 	    internal_move(move(rhs));
+	    return *this;
 	}
 
 	T& operator[](size_t index) const

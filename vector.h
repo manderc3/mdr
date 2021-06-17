@@ -1,18 +1,19 @@
-#ifndef _MDR_VECTOR_H
-#define _MDR_VECTOR_H
+#ifndef _MDR_VECTOR_H_
+#define _MDR_VECTOR_H_
 
-#include <iostream>
+#include "types.h"
+#include "iterator.h"
 
 namespace mdr
 {
-    using U32 = unsigned int;
-    
     template<typename T>
     class vector
     {
     public:
-	vector()
-	    : m_buffer(internal_alloc(m_capacity))
+	using iterator = mdr::iterator<vector, T>;
+	using const_iterator = mdr::iterator<vector const, T const>;
+	
+	vector() : m_buffer(internal_alloc(m_capacity))
 	{
 	}
 
@@ -21,7 +22,7 @@ namespace mdr
 	    internal_dealloc(m_buffer, m_size);
 	}
 
-	T& operator[](U32 index) const
+	T& operator[](size_t index) const
 	{
 	    return m_buffer[index];
 	}
@@ -36,12 +37,32 @@ namespace mdr
 	    return m_buffer[m_size - 1];
 	}
 
-	const U32 size() const
+	iterator begin()
+	{
+	    return iterator(*this, 0);
+	}
+
+	iterator end()
+	{
+	    return iterator(*this, m_size - 1);
+	}
+
+	const_iterator cbegin() const
+	{
+	    return iterator(*this, 0);
+	}
+
+	const_iterator cend() const
+	{
+	    return iterator(*this, m_size - 1);
+	}
+
+	const size_t size() const
 	{
 	    return m_size;
 	}
 
-	const U32 capacity() const
+	const size_t capacity() const
 	{
 	    return m_capacity;
 	}
@@ -78,14 +99,14 @@ namespace mdr
 	    m_capacity = new_capacity;
 	}
 
-	T* internal_alloc(const U32 capacity)
+	T* internal_alloc(const size_t capacity)
 	{
 	    return static_cast<T*>(::operator new(sizeof(T*) * capacity));
 	}
 
-	void internal_dealloc(T* buffer, const U32 size)
+	void internal_dealloc(T* buffer, const size_t size)
 	{
-	    for (U32 i = 0; i < size; i++)
+	    for (size_t i = 0; i < size; i++)
 		buffer[size - 1 - i].~T();
 
 	    ::operator delete(buffer);
@@ -93,12 +114,12 @@ namespace mdr
 
 	void copy_elements(T* from, T* to)
 	{
-	    for (U32 i = 0; i < m_size; i++)	    
+	    for (size_t i = 0; i < m_size; i++)	    
 		to[i] = from[i];
 	}
 
-	U32 m_capacity { 10 };
-	U32 m_size { 0 };
+	size_t m_capacity { 10 };
+	size_t m_size { 0 };
 	
 	T* m_buffer { nullptr };
     };

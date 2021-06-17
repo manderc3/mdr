@@ -3,25 +3,22 @@
 
 #include <iostream>
 
-namespace MDR
+namespace mdr
 {
     using U32 = unsigned int;
     
     template<typename T>
-    class Vector
+    class vector
     {
     public:
-	Vector()
-	    : m_buffer(static_cast<T*>(::operator new(sizeof(T*) * m_capacity)))
+	vector()
+	    : m_buffer(internal_alloc(m_capacity))
 	{
 	}
 
-	~Vector()
+	~vector()
 	{
-	    for (U32 i = 0; i < m_size; i++)
-		m_buffer[m_size - 1 - i].~T();
-
-	    ::operator delete(m_buffer);
+	    internal_dealloc(m_buffer, m_size);
 	}
 
 	T& operator[](U32 index) const
@@ -72,17 +69,26 @@ namespace MDR
 	void increase()
 	{
 	    auto new_capacity { m_capacity * 2 };
-	    auto* new_buffer = static_cast<T*>(::operator new(sizeof(T*) * m_capacity));
+	    auto* new_buffer = internal_alloc(new_capacity);
 	    
 	    copy_elements(m_buffer, new_buffer);
-
-	    for (U32 i = 0; i < m_size; i++)
-		m_buffer[m_size - 1 - i].~T();
-
-	    ::operator delete(m_buffer);
+	    internal_dealloc(m_buffer, m_size);
 
 	    m_buffer = new_buffer;
 	    m_capacity = new_capacity;
+	}
+
+	T* internal_alloc(const U32 capacity)
+	{
+	    return static_cast<T*>(::operator new(sizeof(T*) * capacity));
+	}
+
+	void internal_dealloc(T* buffer, const U32 size)
+	{
+	    for (U32 i = 0; i < size; i++)
+		buffer[size - 1 - i].~T();
+
+	    ::operator delete(buffer);
 	}
 
 	void copy_elements(T* from, T* to)

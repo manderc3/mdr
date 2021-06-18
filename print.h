@@ -5,17 +5,39 @@
 #include <stdio.h>
 #endif
 
+#include "types.h"
 #include "string.h"
 
 namespace mdr
 {
-    void print(const string& str)
+    void print(const string& val)
     {
-	auto* data = str.data();
+	auto* data = val.data();
 	
-	#ifdef __linux__
+#ifdef __linux__
 	printf("%s", data);
-	#endif
+#endif
+    }
+
+    void print(const char val)
+    {
+#ifdef __linux__
+	printf("%d", val);
+#endif
+    }
+    
+    void print(const int val)
+    {
+#ifdef __linux__
+	printf("%d", val);
+#endif
+    }
+    
+    void print(const size_t val)
+    {
+#ifdef __linux__
+	printf("%lld", val);
+#endif
     }
 }
 

@@ -22,7 +22,7 @@ namespace mdr
     void print(const char val)
     {
 #ifdef __linux__
-	printf("%d", val);
+	printf("%c", val);
 #endif
     }
     

@@ -18,7 +18,14 @@ namespace mdr
 	vector()
 	    : m_buffer(internal_alloc(m_capacity))
 	{
-	}	
+	}
+
+	template<typename... args>
+	vector(args&&... pack)
+	    : m_buffer(internal_alloc(m_capacity))
+	{
+	    (void(push_back(pack)), ...);
+	}
 
 	vector(const vector<T>& rhs)
 	    : m_capacity(rhs.m_capacity)

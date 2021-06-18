@@ -11,6 +11,9 @@ namespace mdr
     class string
     {
     public:
+	using iterator = basic_iterator<string, char>;
+	using const_iterator = basic_iterator<const string, const char>;
+
         string(const char data[])
 	    : m_capacity(determine_size(data))
 	    , m_size(m_capacity)
@@ -67,6 +70,26 @@ namespace mdr
 	{
 	    assert(index >= 0 && index < m_size);
 	    return m_buffer[index];
+	}
+
+	iterator begin()
+	{
+	    return { *this, 0 };
+	}
+
+	iterator end()
+	{
+	    return { *this, m_size };
+	}
+
+	const_iterator cbegin() const
+	{
+	    return { *this, 0 };
+	}
+
+	const_iterator cend() const
+	{
+	    return { *this, m_size };
 	}
 
 	const char* data() const

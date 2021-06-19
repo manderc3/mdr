@@ -3,6 +3,7 @@
 
 #include "types.h"
 #include "assert.h"
+#include <iostream>
 
 namespace mdr
 {
@@ -17,6 +18,13 @@ namespace mdr
     {
 	for (size_t i = 0; i < size; i++)
 	    copy(from[i], to[i]);
+    }
+
+    template<typename T>
+    void copy_element_range(const T* from, T* to, size_t begin, size_t size)
+    {
+	for (size_t i = begin; i < begin + size; i++)
+	    copy(from[i], to[i - begin]);
     }
 
     template<typename T>

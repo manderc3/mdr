@@ -106,22 +106,22 @@ namespace mdr
 	    return m_buffer;
 	}
 
-	string substr(const size_t pos, const char matcher[]) const
+	string substr(const char matcher[], const size_t start = 0) const
 	{
-	    return internal_substr(pos, matcher, determine_size(matcher));
+	    return internal_substr(start, matcher, determine_size(matcher));
 	}
 
-	string substr(const size_t pos, const string& matcher) const
+	string substr(const string& matcher, const size_t start = 0) const
 	{
-	    return internal_substr(pos, matcher.data(), matcher.size());
+	    return internal_substr(start, matcher.data(), matcher.size());
 	}
 
-	const size_t find(const size_t start, const char matcher[]) const
+	const size_t find(const char matcher[], const size_t start = 0) const
 	{
 	    return internal_find(start, matcher, determine_size(matcher));
 	}
 
-	const size_t find(const size_t start, const string& matcher, const size_t matcher_size) const
+	const size_t find(const string& matcher, const size_t start = 0) const
 	{
 	    return internal_find(start, matcher.data(), matcher.size());
 	}

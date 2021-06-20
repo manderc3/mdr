@@ -108,20 +108,33 @@ namespace mdr
 
 	string substr(const size_t pos, const char matcher[]) const
 	{
-	    return internal_substr(pos, matcher);
+	    return internal_substr(pos, matcher, determine_size(matcher));
 	}
 
 	string substr(const size_t pos, const string& matcher) const
 	{
-	    return internal_substr(pos, matcher.data());
+	    return internal_substr(pos, matcher.data(), matcher.size());
+	}
+
+	const size_t find(const size_t start, const char matcher[]) const
+	{
+	    return internal_find(start, matcher, determine_size(matcher));
+	}
+
+	const size_t find(const size_t start, const string& matcher, const size_t matcher_size) const
+	{
+	    return internal_find(start, matcher.data(), matcher.size());
+	}
+
+	const size_t size() const
+	{
+	    return m_size;
 	}
 	
     private:
 	char* internal_alloc(const size_t capacity)
 	{
-	    std::cout << "internal_alloc\n";
 	    return new char[capacity];
-	    std::cout << "leaving internal_alloc\n";
 	}
 
 	void internal_dealloc()
@@ -143,46 +156,54 @@ namespace mdr
 	    rhs.m_buffer = nullptr;
 	}
 
-	size_t determine_size(const char data[]) const
+	const size_t determine_size(const char data[]) const
 	{
-	    std::cout << "oops\n";
 	    size_t result { 0 };
 
 	    for (; data[result] != '\0'; result++)
 	    {
 	    }
 
-	    std::cout << result << '\n';
-	    
 	    return result;
 	}
 
-	string internal_substr(const size_t index, const char matcher[]) const
+	string internal_substr(const size_t index, const char matcher[], const size_t matcher_size) const
 	{
 	    assert(index >= 0 && index < m_size, "Index provided is not valid");
 	    assert(matcher != nullptr, "Matcher is nullptr");
-
-	    const size_t matcher_size = determine_size(matcher);
-
 	    assert(index + matcher_size < m_size, "Matcher size relative to index exceeds the size of the character buffer");
 
-	    for (size_t i = index; i < m_size; i++)
+	    if (const size_t pos = internal_find(index, matcher, matcher_size); pos != m_size)
+	    {
+		char* foo = new char[matcher_size];
+		copy_element_range(m_buffer, foo, pos, matcher_size);
+
+		return string(foo);
+	    }
+	
+	    return "";
+	}
+
+	const size_t internal_find(const size_t start, const char matcher[], const size_t matcher_size) const
+	{
+	    assert(start >= 0 && start < m_size, "Start provided is not valid");
+	    assert(matcher != nullptr, "Matcher is nullptr");
+	    assert(start + matcher_size < m_size, "Matcher size relative to start exceeds the size of the character buffer");
+
+	    for (size_t index = start; index < m_size; index++)
 	    {
 		size_t matcher_count { 0 };
-		for(; m_buffer[i + matcher_count] == matcher[matcher_count] && m_buffer[i + matcher_count] != '\0'; ++matcher_count)
+		for(; m_buffer[index + matcher_count] == matcher[matcher_count] && m_buffer[index + matcher_count] != '\0'; ++matcher_count)
 		{
 		}
 
 		if (matcher_count == matcher_size)
 		{
-		    char* foo = new char[matcher_size];
-		    copy_element_range(m_buffer, foo, i, matcher_count);
-
-		    return string(foo);
+		    return index;
 		}
 	    }
-
-	    return "";
+	    
+	    return m_size;
 	}
 	
 	size_t m_capacity;

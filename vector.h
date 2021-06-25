@@ -17,13 +17,13 @@ namespace mdr
 	using const_iterator = basic_iterator<const vector, const T>;
 	
 	vector()
-	    : m_buffer(container::alloc<char>(m_capacity))
+	    : m_buffer(container::alloc<T>(m_capacity))
 	{
 	}
 
 	template<typename... args>
 	vector(args&&... pack)
-	    : m_buffer(container::alloc<char>(m_capacity))
+	    : m_buffer(container::alloc<T>(m_capacity))
 	{
 	    (void(push_back(pack)), ...);
 	}

@@ -5,6 +5,7 @@
 #include "types.h"
 #include "utility.h"
 #include "iterator.h"
+#include "container_common.h"
 
 namespace mdr
 {
@@ -16,13 +17,13 @@ namespace mdr
 	using const_iterator = basic_iterator<const vector, const T>;
 	
 	vector()
-	    : m_buffer(internal_alloc(m_capacity))
+	    : m_buffer(container::alloc<char>(m_capacity))
 	{
 	}
 
 	template<typename... args>
 	vector(args&&... pack)
-	    : m_buffer(internal_alloc(m_capacity))
+	    : m_buffer(container::alloc<char>(m_capacity))
 	{
 	    (void(push_back(pack)), ...);
 	}
@@ -30,7 +31,7 @@ namespace mdr
 	vector(const vector<T>& rhs)
 	    : m_capacity(rhs.m_capacity)
 	    , m_size(rhs.m_size)
-	    , m_buffer(internal_alloc(rhs.m_capacity))
+	    , m_buffer(container::alloc<T>(rhs.m_capacity))
 	{
 	    copy_elements(rhs.m_buffer, m_buffer, m_size);
 	}
@@ -42,14 +43,14 @@ namespace mdr
 	
 	~vector()
 	{
-	    internal_dealloc(m_buffer, m_size);
+	    container::dealloc(m_buffer, m_size);
 	}
 
 	vector& operator=(const vector<T>& rhs)
 	{
 	    m_capacity = rhs.m_capacity;
 	    m_size = rhs.m_size;
-	    m_buffer = internal_alloc(rhs.m_capacity);
+	    m_buffer = container::alloc<T>(rhs.m_capacity);
 
 	    copy_elements(rhs.m_buffer, m_buffer, m_size);
 	    return *this;
@@ -136,32 +137,19 @@ namespace mdr
 	void increase_capacity()
 	{
 	    auto new_capacity { m_capacity * 2 };
-	    auto* new_buffer = internal_alloc(new_capacity);
+	    auto* new_buffer = container::alloc<T>(new_capacity);
 	    
 	    copy_elements(m_buffer, new_buffer, m_size);
-	    internal_dealloc(m_buffer, m_size);
+	    container::dealloc(m_buffer, m_size);
 
 	    m_buffer = new_buffer;
 	    m_capacity = new_capacity;
 	}
 
-	T* internal_alloc(const size_t capacity)
-	{
-	    return static_cast<T*>(::operator new(sizeof(T*) * capacity));
-	}
-
-	void internal_dealloc(T* buffer, const size_t size)
-	{
-	    for (size_t i = 0; i < size; i++)
-		buffer[size - 1 - i].~T();
-
-	    ::operator delete(buffer);
-	}
-
 	void internal_move(vector<T>&& rhs)
 	{
 	    if (m_buffer != nullptr)
-		internal_dealloc(m_buffer, m_size);
+		container::dealloc(m_buffer, m_size);
 
 	    m_capacity = rhs.m_capacity;
 	    m_size = rhs.m_size;

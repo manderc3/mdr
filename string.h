@@ -5,6 +5,7 @@
 #include "utility.h"
 #include "assert.h"
 #include "iterator.h"
+#include "container_common.h"
 
 #include <iostream>
 
@@ -19,7 +20,7 @@ namespace mdr
         string(const char data[])
 	    : m_capacity(determine_size(data))
 	    , m_size(m_capacity)
-	    , m_buffer(internal_alloc(m_capacity))
+	    , m_buffer(container::alloc<char>(m_capacity))
 	{
 	    copy_elements(data, m_buffer, m_size);
 	}
@@ -34,7 +35,7 @@ namespace mdr
 	string(const string& rhs)
 	    : m_capacity(rhs.m_capacity)
 	    , m_size(rhs.m_size)
-	    , m_buffer(internal_alloc(rhs.m_capacity))
+	    , m_buffer(container::alloc<char>(rhs.m_capacity))
 	{
 	    copy_elements(rhs.m_buffer, m_buffer, m_size);
 	}
@@ -46,14 +47,14 @@ namespace mdr
 	
 	~string()
 	{
-	    internal_dealloc();
+	    container::dealloc(m_buffer, m_size);
 	}	
 	
 	string& operator=(const char data[])
 	{	    
 	    m_size = determine_size(data);
 	    m_capacity = m_size;
-	    m_buffer = internal_alloc(m_capacity);
+	    m_buffer = container::alloc<char>(m_capacity);
 	    
 	    copy_elements(data, m_buffer, m_size);
 	    return *this;
@@ -63,7 +64,7 @@ namespace mdr
 	{
 	    m_capacity = rhs.m_capacity;
 	    m_size = rhs.m_size;
-	    m_buffer = internal_alloc(rhs.m_capacity);
+	    m_buffer = container::alloc<char>(rhs.m_capacity);
 
 	    copy_elements(rhs.m_buffer, m_buffer, m_size);
 	    return *this;
@@ -73,6 +74,20 @@ namespace mdr
 	{
 	    internal_move(move(rhs));
 	    return *this;
+	}
+
+	string& operator+=(const string& rhs)
+	{
+	    if (m_size == m_capacity)
+		m_buffer = container::increase_capacity<char>(m_buffer, m_capacity, m_capacity * 2);
+		
+	    return *this;
+	}
+
+	string operator+(const string& rhs)
+	{
+	    string new_str("temp");
+	    return new_str;
 	}
 
 	char& operator[](size_t index) const
@@ -126,9 +141,24 @@ namespace mdr
 	    return internal_find(start, matcher.data(), matcher.size());
 	}
 
+	const void erase(const char matcher[], const size_t start = 0) const
+	{
+	    internal_erase(start, matcher, determine_size(matcher));
+	}
+
+	const void erase(const string& matcher, const size_t start = 0) const
+	{
+	    internal_erase(start, matcher.data(), matcher.size());
+	}
+
 	const size_t size() const
 	{
 	    return m_size;
+	}
+
+	const size_t capacity() const
+	{
+	    return m_capacity;
 	}
 	
     private:
@@ -205,6 +235,11 @@ namespace mdr
 	    
 	    return m_size;
 	}
+
+	void internal_erase(const size_t start, const char matcher[], const size_t matcher_sizean) const
+	{
+	    // TODO
+	}	     
 	
 	size_t m_capacity;
 	size_t m_size;

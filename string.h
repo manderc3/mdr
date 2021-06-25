@@ -169,7 +169,8 @@ namespace mdr
 
 	void internal_dealloc()
 	{
-	    delete[] m_buffer;
+	    if (m_buffer != nullptr)
+		delete[] m_buffer;
 	}
 
 	void internal_move(string&& rhs)
@@ -244,7 +245,7 @@ namespace mdr
 	size_t m_capacity;
 	size_t m_size;
 
-	char* m_buffer;	
+	char* m_buffer { nullptr };
     };
 }
 

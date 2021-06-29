@@ -17,19 +17,20 @@ namespace mdr
 	using iterator = basic_iterator<string, char>;
 	using const_iterator = basic_iterator<const string, const char>;
 
-        string(const char data[])
+	string(const char data[])
 	    : m_capacity(determine_size(data))
 	    , m_size(m_capacity)
 	    , m_buffer(container::alloc<char>(m_capacity))
 	{
 	    copy_elements(data, m_buffer, m_size);
 	}
-
+	
 	string(char* data)
 	    : m_capacity(determine_size(data))
 	    , m_size(m_capacity)
-	    , m_buffer(data)
+	    , m_buffer(container::alloc<char>(m_capacity))
 	{
+	    copy_elements(data, m_buffer, m_size);
 	}
 
 	string(const string& rhs)
@@ -96,6 +97,27 @@ namespace mdr
 	    return m_buffer[index];
 	}
 
+	const bool operator==(const string& rhs) const
+	{
+	    if (m_size != rhs.m_size)
+		return false;
+
+	    for (size_t i = 0; i < m_size; i++)
+		if (m_buffer[i] != rhs.m_buffer[i])
+		    return false;
+
+	    return true;    
+	}
+	
+	const bool operator!=(const string& rhs) const
+	{
+	    for (size_t i = 0; i < m_size; i++)
+		if (m_buffer[i] != rhs.m_buffer[i])
+		    return true;
+
+	    return false;    
+	}
+
 	iterator begin()
 	{
 	    return { *this, 0 };
@@ -129,6 +151,11 @@ namespace mdr
 	string substr(const string& matcher, const size_t start = 0) const
 	{
 	    return internal_substr(start, matcher.data(), matcher.size());
+	}
+
+	string substr(const size_t start, const size_t size) const
+	{
+	    return internal_substr(start, size);
 	}
 
 	const size_t find(const char matcher[], const size_t start = 0) const
@@ -198,6 +225,14 @@ namespace mdr
 	    return result;
 	}
 
+	string internal_substr(const size_t start, const size_t size) const
+	{
+	    char* new_buff = new char[size];
+	    copy_element_range(m_buffer, new_buff, 0, size);
+
+	    return string(new_buff);
+	}
+
 	string internal_substr(const size_t index, const char matcher[], const size_t matcher_size) const
 	{
 	    assert(index >= 0 && index < m_size, "Index provided is not valid");
@@ -206,10 +241,10 @@ namespace mdr
 
 	    if (const size_t pos = internal_find(index, matcher, matcher_size); pos != m_size)
 	    {
-		char* foo = new char[matcher_size];
-		copy_element_range(m_buffer, foo, pos, matcher_size);
+		char* new_buff = new char[matcher_size];
+		copy_element_range(m_buffer, new_buff, pos, matcher_size);
 
-		return string(foo);
+		return string(new_buff);
 	    }
 	
 	    return "";
@@ -240,7 +275,7 @@ namespace mdr
 	void internal_erase(const size_t start, const char matcher[], const size_t matcher_sizean) const
 	{
 	    // TODO
-	}	     
+	}
 	
 	size_t m_capacity;
 	size_t m_size;
